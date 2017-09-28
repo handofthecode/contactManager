@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+	<title>Contact Manager</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" type="text/css" href="stylesheet.css">
+	<script src="https://code.jquery.com/jquery-1.12.4.js"
+	  integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="
+	  crossorigin="anonymous">
+	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.js"></script>
+</head>
+	<body>
+			<header>
+				<h1>Contact Manager</h1>
+			</header>
+			<main>
+				<div id="tools">
+					<button class="add_contact">Add Contact</button>
+					<input id="search" type="text" placeholder="Search" />
+				</div>
+				<div id="no_contacts">
+					<h2>There are no contacts</h2>
+					<button class="add_contact">Add Contact</button>
+				</div>
+				<div id="contacts">
+					<script id="entry-template" type="text/x-handlebars-template">
+						<div class="contact" data-id="0">
+							<h3>{{name}}</h3>
+							<dl>
+								<dt>Phone Number:</dt>
+								<dd>{{phone}}</dd>
+								<dt>Email:</dt>
+								<dd>{{email}}</dd>
+								<dt>Occupation:</dt>
+								<dd>{{occupation}}</dd>
+							</dl>
+							<button type="button">Edit</button>
+							<button type="button" class="delete">Delete</button>
+						</div>
+					</script>
+				</div>
+				<div id="new_contact">
+					<h2>Create Contact</h2>
+					<form>
+						<fieldset>
+							<label for="full_name">Full name:</label>
+							<input type='text' id="full_name"/>
+							<label for="email">Email address:</label>
+							<input type="email" id="email" />
+							<label for="phone">Phone number:</label>
+							<input type="tel" id="phone" />
+							<fieldset id="occupation" class="radios">
+								<label for="engineering">engineering</label>
+								<input type="radio" name="occupation" id="engineering" value="engineering">
+								<label for="marketing">marketing</label>
+								<input type="radio" name="occupation" id="marketing" value="marketing">
+								<label for="sales">sales</label>
+								<input type="radio" name="occupation" id="sales" value="sales">
+							</fieldset>
+							<fieldset>
+								<button type="submit" id="submit">Submit</button>
+								<button type="button" id="cancel">Cancel</button>
+							</fieldset>
+						</fieldset>
+					</form>
+				</div>
+			</main>
+			<footer>
+				<p>abcdefg</p>
+			</footer>
+			<script src="script.js"></script>
+	</body>
+</html>
