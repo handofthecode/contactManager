@@ -4,10 +4,15 @@ $tools = $('#tools');
 $submitBTN = $('#submit');
 $contacts = $('#contacts');
 
+/* INPUTS */
 $fullName = $('#full_name');
 $email = $('#email');
 $phone = $('#phone');
 $occupation = $('#occupation');
+
+/* ELEMENTS */
+$invalidNotification = $('<p>please enter valid value</p>');
+$invalidOccupation = $('<p>You must select an occupation</p>');
 
 var contactManager = {
   registerHandlers: function() {
@@ -21,6 +26,7 @@ var contactManager = {
     var id = +$contact.attr('data-id');
     this.contacts = this.contacts.filter(obj => obj['id'] !== id);
     $contact.remove();
+    this.handleCancel();
   },
   handleAddContact: function() {
     $noContacts.slideUp();
@@ -35,18 +41,59 @@ var contactManager = {
     if (this.contacts.length === 0) $noContacts.slideDown();
   },
   handleSubmit: function(e) {
-    e.preventDefault();
-    var occupation = $('input[name="occupation"]:checked').val();
-    var contact = {
-      name: $fullName.val(),
-      email: $email.val(),
-      phone: $phone.val(),
-      occupation: occupation,
-      id: this.contactID,
-    };
-    this.insertContact(contact);
-    this.contacts.push(contact);
-    this.handleCancel();
+      e.preventDefault();
+      var occupation = $('input[name="occupation"]:checked').val();
+      var contact = {
+        name: $fullName.val(),
+        email: $email.val(),
+        phone: $phone.val(),
+        occupation: occupation,
+        id: this.contactID,
+      };
+      if (this.validInput(contact)) {
+        this.insertContact(contact);
+        this.contacts.push(contact);
+        this.handleCancel();
+        this.clearForm();
+      }
+  },
+  clearForm: function() {
+    $('button[type=reset]').trigger('click');
+  },
+  validInput: function(contact) {
+    if (!contact.name.match(/^\w+( \w*)*$/)) {
+      this.invalid($fullName);
+      return false;
+    } else {
+      this.valid($fullName);
+    }
+    if (!contact.email.match(/^[a-zA-Z1-9._]+@\w+\.[a-z]{2,4}$/)) {
+      this.invalid($email);
+      return false;
+    } else {
+      this.valid($email);
+    }
+    if (!contact.phone.match(/^(\d{3}[\.-]?){2}\d{4}$/)) {
+      this.invalid($phone);
+      return false;
+    } else {
+      this.valid($phone);
+    }
+    if (contact.occupation === undefined) {
+      this.invalidOccupation();
+      return false;
+    } 
+
+    return true;
+  },
+  invalid: function(input) {
+    input.closest('div').addClass('invalid').append($invalidNotification);
+  },
+  valid: function(input) {
+    input.closest('div').removeClass('invalid');
+  },
+  invalidOccupation: function() {
+    $occupation.append($invalidOccupation);
   },
   insertContact: function(contact) {
     var source = $('#entry-template').html();

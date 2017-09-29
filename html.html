@@ -42,14 +42,22 @@
 				</div>
 				<div id="new_contact">
 					<h2>Create Contact</h2>
-					<form>
+					<form id="form">
 						<fieldset>
-							<label for="full_name">Full name:</label>
-							<input type='text' id="full_name"/>
-							<label for="email">Email address:</label>
-							<input type="email" id="email" />
-							<label for="phone">Phone number:</label>
-							<input type="tel" id="phone" />
+							<fieldset class="inputs">
+								<div>
+									<label for="full_name">Full name:</label>
+									<input type='text' id="full_name"/>
+								</div>
+								<div>
+									<label for="email">Email address:</label>
+									<input type="email" id="email" />
+								</div>
+								<div>
+								<label for="phone">Phone number:</label>
+									<input type="tel" id="phone" />
+								</div>
+							</fieldset>
 							<fieldset id="occupation" class="radios">
 								<label for="engineering">engineering</label>
 								<input type="radio" name="occupation" id="engineering" value="engineering">
@@ -61,6 +69,7 @@
 							<fieldset>
 								<button type="submit" id="submit">Submit</button>
 								<button type="button" id="cancel">Cancel</button>
+								<button type="reset" id="reset">Reset</button>
 							</fieldset>
 						</fieldset>
 					</form>
