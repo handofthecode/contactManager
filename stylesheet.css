@@ -113,25 +113,29 @@ input[type="tel"] {
 	border-radius: 5px;
 	width: 250px;
 }
-fieldset.inputs p {
+p.notice {
  margin-bottom: 30px;
  text-align: center;
+ display: none;
 }
-fieldset.inputs > div {
+form div {
+	background-color: #fff;
+}
+form fieldset.inputs div {
 	margin-bottom: 30px;
 	text-align: right;
-	background-color: #fff;
 }
 fieldset.inputs > div:last-child {
 	margin-bottom: 20px;
 }
 div.invalid p,
-div.invalid label {
+fieldset.inputs div.invalid label {
 	color: red;
 }
 div.invalid > p {
 	position: relative;
 	right: -20px;
+	display: block;
 }
 div.invalid input {
 	border-color: red;
@@ -143,7 +147,6 @@ input[type="radio"] {
 fieldset#occupation > p {
 	color: red;
 }
-
 
 /* CONTACTS */
 #contacts {

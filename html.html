@@ -35,37 +35,43 @@
 								<dt>Occupation:</dt>
 								<dd>{{occupation}}</dd>
 							</dl>
-							<button type="button">Edit</button>
+							<button type="button" class="edit">Edit</button>
 							<button type="button" class="delete">Delete</button>
 						</div>
 					</script>
 				</div>
 				<div id="new_contact">
 					<h2>Create Contact</h2>
-					<form id="form">
+					<form>
 						<fieldset>
 							<fieldset class="inputs">
 								<div>
 									<label for="full_name">Full name:</label>
 									<input type='text' id="full_name"/>
+									<p class="notice">please enter a valid value</p>
 								</div>
 								<div>
 									<label for="email">Email address:</label>
 									<input type="email" id="email" />
+									<p class="notice">please enter a valid value</p>
 								</div>
 								<div>
-								<label for="phone">Phone number:</label>
+									<label for="phone">Phone number:</label>
 									<input type="tel" id="phone" />
+									<p class="notice">please enter a valid value</p>
 								</div>
 							</fieldset>
-							<fieldset id="occupation" class="radios">
-								<label for="engineering">engineering</label>
-								<input type="radio" name="occupation" id="engineering" value="engineering">
-								<label for="marketing">marketing</label>
-								<input type="radio" name="occupation" id="marketing" value="marketing">
-								<label for="sales">sales</label>
-								<input type="radio" name="occupation" id="sales" value="sales">
-							</fieldset>
+							<div>
+								<fieldset id="occupation">
+									<label for="engineering">engineering</label>
+									<input type="radio" name="occupation" id="engineering" value="engineering">
+									<label for="marketing">marketing</label>
+									<input type="radio" name="occupation" id="marketing" value="marketing">
+									<label for="sales">sales</label>
+									<input type="radio" name="occupation" id="sales" value="sales">
+								</fieldset>
+								<p class="notice">please enter a valid value</p>
+							</div>
 							<fieldset>
 								<button type="submit" id="submit">Submit</button>
 								<button type="button" id="cancel">Cancel</button>
