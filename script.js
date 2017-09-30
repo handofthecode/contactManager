@@ -4,6 +4,12 @@ $tools = $('#tools');
 $submitBTN = $('#submit');
 $contacts = $('#contacts');
 
+/* SEARCH */
+$searchTags = $('input[name=search-tag]');
+$searchEngineering = $('#search_engineering');
+$searchMarketing = $('search_marketing');
+$searchSales = $('search_sales');
+
 /* INPUTS */
 $fullName = $('#full_name');
 $email = $('#email');
@@ -17,6 +23,19 @@ var contactManager = {
     $submitBTN.on('click', this.handleSubmit.bind(this));
     $(document).on('click', '.delete', this.handleDeleteContact.bind(this));
     $(document).on('click', '.edit', this.handleUpdate.bind(this));
+    $(document).on('click', '#search', this.handleSearch.bind(this));
+  },
+  handleSearch: function(e) {
+    var activeTags = [];
+    if ($(e.target).is('input[name=search-tag]')) {
+      $searchTags.each(function(i) {
+        if ($searchTags[i].checked) activeTags.push($searchTags[i].getAttribute('data-tag'))
+      });
+    }
+    this.clearAllContacts();
+    this.contacts.forEach(function(contact) {
+      if (activeTags.includes(contact['occupation'])) this.insertNewContact(contact);
+    }.bind(this));
   },
   handleDeleteContact: function(e) {
     var $contact = $(e.target.closest('.contact'));

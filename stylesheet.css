@@ -157,6 +157,8 @@ fieldset#occupation > p {
 .contact {
 	display: inline-block;
 	background-color: white;
+	border: 1px solid #aaa;
+	padding: 0 10px 0 10px;
 }
 dt {
 	font-weight: 600;

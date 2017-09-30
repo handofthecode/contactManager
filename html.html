@@ -17,7 +17,20 @@
 			<main>
 				<div id="tools">
 					<button class="add_contact">Add Contact</button>
-					<input id="search" type="text" placeholder="Search" />
+					<div id="search">
+						<input type="text" placeholder="Search" />
+						<div>
+							<label>engineering
+								<input type="checkbox" id="search_enginering" data-tag="engineering" name="search-tag" checked/>
+							</label>
+							<label>marketing
+								<input type="checkbox" id="search_marketing" data-tag="marketing" name="search-tag" checked/>
+							</label>
+							<label>sales
+								<input type="checkbox" id="search_sales" data-tag="sales" name="search-tag" checked/>
+							</label>
+						</div>
+					</div>
 				</div>
 				<div id="no_contacts">
 					<h2>There are no contacts</h2>
