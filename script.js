@@ -27,12 +27,12 @@ var contactManager = {
   },
   handleSearch: function(e) {
     var activeTags = [];
+    this.clearAllContacts();
     if ($(e.target).is('input[name=search-tag]')) {
       $searchTags.each(function(i) {
         if ($searchTags[i].checked) activeTags.push($searchTags[i].getAttribute('data-tag'))
       });
     }
-    this.clearAllContacts();
     this.contacts.forEach(function(contact) {
       if (activeTags.includes(contact['occupation'])) this.insertNewContact(contact);
     }.bind(this));
@@ -50,6 +50,10 @@ var contactManager = {
       $('#new_contact > h2').html('Create Contact');
       this.clearForm();
     }
+    this.openForm();
+    
+  },
+  openForm: function() {
     $noContacts.slideUp();
     $tools.slideUp();
     $contacts.slideUp();
@@ -66,7 +70,10 @@ var contactManager = {
   handleUpdate: function(e) {
     var id = $(e.target).closest('.contact').attr('data-id');
     var contact = this.contacts.find(contact => contact['id'] === +id);
-    this.handleAddContact();
+    console.log(contact);
+    console.log(id)
+    console.log(contact['id']);
+    this.openForm();
     $fullName.val(contact['name']);
     $email.val(contact['email']);
     $phone.val(contact['phone']);
@@ -92,6 +99,7 @@ var contactManager = {
           this.contacts.splice(contactIDX, 1, contact);
           this.loadAllContacts();
         } else {
+          console.log('new')
           this.insertNewContact(contact);
           this.contacts.push(contact);
           this.contactID++;
@@ -149,7 +157,7 @@ var contactManager = {
   insertNewContact: function(contact) {
     var source = $('#entry-template').html();
     var template = Handlebars.compile(source);
-    $('#contacts').append(template(contact)).children('.contact:last-child').attr('data-id', this.contactID);
+    $('#contacts').append(template(contact)).children('.contact:last-child').attr('data-id', contact['id']);
   },
   init: function() {
     this.registerHandlers();
