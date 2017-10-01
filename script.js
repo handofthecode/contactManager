@@ -5,6 +5,7 @@ $submitBTN = $('#submit');
 $contacts = $('#contacts');
 
 /* SEARCH */
+$search = $('#search input');
 $searchTags = $('input[name=search-tag]');
 $searchEngineering = $('#search_engineering');
 $searchMarketing = $('search_marketing');
@@ -23,19 +24,26 @@ var contactManager = {
     $submitBTN.on('click', this.handleSubmit.bind(this));
     $(document).on('click', '.delete', this.handleDeleteContact.bind(this));
     $(document).on('click', '.edit', this.handleUpdate.bind(this));
-    $(document).on('click', '#search', this.handleSearch.bind(this));
+    $(document).on('click keyup', '#search', this.handleSearch.bind(this));
   },
   handleSearch: function(e) {
-    var activeTags = [];
     this.clearAllContacts();
-    if ($(e.target).is('input[name=search-tag]')) {
+    var activeTags = this.retrieveTags(e);
+    var query = $search.val().toLowerCase();
+    this.contacts.forEach(function(contact) {
+      var occupation = contact['occupation'];
+      var name = contact['name'].toLowerCase();
+      if (activeTags.includes(occupation) && name.slice(0, query.length) === query) {
+        this.insertNewContact(contact);
+      }   
+    }.bind(this));
+  },
+  retrieveTags: function(e) {
+    var activeTags = [];
       $searchTags.each(function(i) {
         if ($searchTags[i].checked) activeTags.push($searchTags[i].getAttribute('data-tag'))
       });
-    }
-    this.contacts.forEach(function(contact) {
-      if (activeTags.includes(contact['occupation'])) this.insertNewContact(contact);
-    }.bind(this));
+    return activeTags;
   },
   handleDeleteContact: function(e) {
     var $contact = $(e.target.closest('.contact'));
@@ -51,7 +59,6 @@ var contactManager = {
       this.clearForm();
     }
     this.openForm();
-    
   },
   openForm: function() {
     $noContacts.slideUp();
@@ -63,16 +70,18 @@ var contactManager = {
     $newContact.slideUp();
     $contacts.slideDown();
     $tools.slideDown();
-    
-    if (this.contacts.length === 0) $noContacts.slideDown();
 
+    this.loadAllContacts();
+    this.resetSearch();
+    if (this.contacts.length === 0) $noContacts.slideDown();
+  },
+  resetSearch: function() {
+    $search.val('');
+    $searchTags.prop('checked', true);
   },
   handleUpdate: function(e) {
     var id = $(e.target).closest('.contact').attr('data-id');
     var contact = this.contacts.find(contact => contact['id'] === +id);
-    console.log(contact);
-    console.log(id)
-    console.log(contact['id']);
     this.openForm();
     $fullName.val(contact['name']);
     $email.val(contact['email']);
@@ -99,7 +108,6 @@ var contactManager = {
           this.contacts.splice(contactIDX, 1, contact);
           this.loadAllContacts();
         } else {
-          console.log('new')
           this.insertNewContact(contact);
           this.contacts.push(contact);
           this.contactID++;
