@@ -18,6 +18,9 @@ time, mark, audio, video {
 	font: inherit;
 	vertical-align: baseline;
 }
+html {
+	min-width: 442px;
+}
 body {
 	font: normal 16px Helvetica, Arial, sans-serif;
 	text-align: center;
