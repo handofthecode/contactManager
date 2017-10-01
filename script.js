@@ -18,6 +18,15 @@ $phone = $('#phone');
 $occupation = $('#occupation');
 
 var contactManager = {
+  saveContactData: function() {
+    localStorage.setItem('contacts', JSON.stringify(this.contacts));
+    localStorage.setItem('serialID', this.serialID);
+  },
+  loadContactsData: function() {
+    this.contacts = JSON.parse(localStorage.getItem('contacts')) || [];
+    this.serialID = +localStorage.getItem('serialID') || 1;
+    if (this.contacts.length !== 0) $noContacts.hide();
+  },
   registerHandlers: function() {
     $('.add_contact').on('click', this.handleAddContact.bind(this));
     $('#cancel').on('click', this.handleCancel.bind(this));
@@ -51,6 +60,7 @@ var contactManager = {
     this.contacts = this.contacts.filter(obj => obj['id'] !== id);
     $contact.remove();
     this.handleCancel();
+    this.saveContactData();
   },
   handleAddContact: function() {
     if ($submitBTN[0].hasAttribute('data-updating')) {
@@ -99,7 +109,7 @@ var contactManager = {
         email: $email.val(),
         phone: $phone.val(),
         occupation: occupation,
-        id: this.contactID,
+        id: this.serialID,
       };
       if (this.validInput(contact)) {
         if (updateID) {
@@ -110,10 +120,11 @@ var contactManager = {
         } else {
           this.insertNewContact(contact);
           this.contacts.push(contact);
-          this.contactID++;
+          this.serialID++;
       }
         this.handleCancel();
         this.clearForm();
+        this.saveContactData();
       }
   },
   loadAllContacts: function() {
@@ -169,8 +180,8 @@ var contactManager = {
   },
   init: function() {
     this.registerHandlers();
-    this.contacts = [];
-    this.contactID = 1;
+    this.loadContactsData();
+    this.loadAllContacts();
   }
 }
 var test = Object.create(contactManager);
