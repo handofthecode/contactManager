@@ -7,9 +7,6 @@ $contacts = $('#contacts');
 /* SEARCH */
 $search = $('#search input');
 $searchTags = $('input[name=search-tag]');
-$searchEngineering = $('#search_engineering');
-$searchMarketing = $('search_marketing');
-$searchSales = $('search_sales');
 
 /* INPUTS */
 $fullName = $('#full_name');
@@ -167,8 +164,7 @@ var contactManager = {
     return valid;
   },
   invalid: function(input) {
-    var $div = input.closest('div');
-    if (!$div.hasClass('invalid')) $div.addClass('invalid');
+    input.closest('div').addClass('invalid');
   },
   valid: function(input) {
     input.closest('div').removeClass('invalid');

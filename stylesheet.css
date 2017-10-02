@@ -143,7 +143,6 @@ div.invalid > p {
 div.invalid input {
 	border-color: red;
 }
-
 input[type="radio"] {
 	margin-right: 20px;
 }
