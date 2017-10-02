@@ -5,8 +5,9 @@ $submitBTN = $('#submit');
 $contacts = $('#contacts');
 
 /* SEARCH */
-$search = $('#search input');
+$search = $('#search input[type=text]');
 $searchTags = $('input[name=search-tag]');
+$searchNoContacts = $('#search_no_contacts');
 
 /* INPUTS */
 $fullName = $('#full_name');
@@ -43,6 +44,13 @@ var contactManager = {
         this.insertNewContact(contact);
       }   
     }.bind(this));
+
+    if ($contacts.children('.contact').length === 0 && this.contacts.length !== 0) {
+      $searchNoContacts.slideDown().contents($('em').html($search.val()));
+    }
+    else {
+      $searchNoContacts.slideUp();
+    }
   },
   retrieveTags: function(e) {
     var activeTags = [];
@@ -65,6 +73,7 @@ var contactManager = {
       $('#new_contact > h2').html('Create Contact');
       this.clearForm();
     }
+    this.setAllValid();
     this.openForm();
   },
   openForm: function() {
@@ -94,6 +103,7 @@ var contactManager = {
     $email.val(contact['email']);
     $phone.val(contact['phone']);
     $('#' + contact['occupation']).prop('checked', true);
+    this.validInput(contact);
     $('#new_contact h2').text('Edit Contact');
     $submitBTN.attr('data-updating', id);
   },
@@ -127,6 +137,7 @@ var contactManager = {
   loadAllContacts: function() {
     this.clearAllContacts();
     this.contacts.forEach(contact => this.insertNewContact(contact));
+    if (this.contacts.length === 0) $noContacts.slideDown();
   },
   clearAllContacts: function() {
     $('.contact').remove();
@@ -145,23 +156,26 @@ var contactManager = {
   },
   validateInput: function(element, string, regex) {
     if (string === undefined || !string.match(regex)) {
-      this.invalid(element);
+      this.setInvalid(element);
       return false;
     } else {
-      this.valid(element);
+      this.setValid(element);
       return true
     }
   },
-  invalid: function(input) {
-    input.closest('div').addClass('invalid');
+  setInvalid: function(input) {
+    input.closest('div.input').addClass('invalid');
   },
-  valid: function(input) {
-    input.closest('div').removeClass('invalid');
+  setValid: function(input) {
+    input.closest('div.input').removeClass('invalid');
+  },
+  setAllValid: function() {
+    $('div.input').removeClass('invalid');
   },
   insertNewContact: function(contact) {
     var source = $('#entry-template').html();
     var template = Handlebars.compile(source);
-    $('#contacts').append(template(contact)).children('.contact:last-child').attr('data-id', contact['id']);
+    $contacts.append(template(contact)).children('.contact:last-child').attr('data-id', contact['id']);
   },
   init: function() {
     this.registerHandlers();
