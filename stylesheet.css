@@ -84,7 +84,7 @@ button.add_contact {
 	clear: both;
 }
 #no_contacts,
-#search_no_contacts {
+#no_contacts_found {
 	margin: 40px 0 30px 0;
 	padding: 30px 0 10px 0;
 	display: none;

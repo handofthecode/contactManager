@@ -5,9 +5,10 @@ $submitBTN = $('#submit');
 $contacts = $('#contacts');
 
 /* SEARCH */
-$search = $('#search input[type=text]');
+$search = $('#search');
+$searchBar = $('#search input[type=text]');
 $searchTags = $('input[name=search-tag]');
-$searchNoContacts = $('#search_no_contacts');
+$noContactsFound = $('#no_contacts_found');
 
 /* INPUTS */
 $fullName = $('#full_name');
@@ -29,14 +30,14 @@ var contactManager = {
     $('.add_contact').on('click', this.handleAddContact.bind(this));
     $('#cancel').on('click', this.handleCancel.bind(this));
     $submitBTN.on('click', this.handleSubmit.bind(this));
-    $(document).on('click', '.delete', this.handleDeleteContact.bind(this));
-    $(document).on('click', '.edit', this.handleUpdate.bind(this));
-    $(document).on('click keyup', '#search', this.handleSearch.bind(this));
+    $contacts.on('click', '.delete', this.handleDeleteContact.bind(this));
+    $contacts.on('click', '.edit', this.handleUpdate.bind(this));
+    $search.on('click keyup', this.handleSearch.bind(this));
   },
   handleSearch: function(e) {
     this.clearAllContacts();
     var activeTags = this.retrieveTags(e);
-    var query = $search.val().toLowerCase();
+    var query = $searchBar.val().toLowerCase();
     this.contacts.forEach(function(contact) {
       var occupation = contact['occupation'];
       var name = contact['name'].toLowerCase();
@@ -46,10 +47,10 @@ var contactManager = {
     }.bind(this));
 
     if ($contacts.children('.contact').length === 0 && this.contacts.length !== 0) {
-      $searchNoContacts.slideDown().contents($('em').html($search.val()));
+      $noContactsFound.slideDown().contents($('em').html($search.val()));
     }
     else {
-      $searchNoContacts.slideUp();
+      $noContactsFound.slideUp();
     }
   },
   retrieveTags: function(e) {
