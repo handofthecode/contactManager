@@ -135,33 +135,22 @@ var contactManager = {
     $('button[type=reset]').trigger('click');
   },
   validInput: function(contact) {
-    var valid = true;
-    if (!contact.name.match(/^\w+( \w*)*$/)) {
-      this.invalid($fullName);
-      valid = false;
-    } else {
-      this.valid($fullName);
-    }
-    if (!contact.email.match(/^[a-zA-Z1-9._]+@\w+\.[a-z]{2,4}$/)) {
-      this.invalid($email);
-      valid = false;
-    } else {
-      this.valid($email);
-    }
-    if (!contact.phone.match(/^(\d{3}[\.-]?){2}\d{4}$/)) {
-      this.invalid($phone);
-      valid = false;
-    } else {
-      this.valid($phone);
-    }
-    if (contact.occupation === undefined) {
-      this.invalid($occupation);
-      valid = false;
-    } else {
-      this.valid($occupation);
-    }
+    valid = true;
+    if (!this.validateInput($fullName, contact.name, /^\w+( \w*)*$/)) valid = false;
+    if (!this.validateInput($email, contact.email, /^[a-zA-Z1-9._]+@\w+\.[a-z]{2,4}$/)) valid = false;
+    if (!this.validateInput($phone, contact.phone, /^(\d{3}[\.-]?){2}\d{4}$/)) valid = false;
+    if (!this.validateInput($occupation, contact.occupation, '')) valid = false;
 
     return valid;
+  },
+  validateInput: function(element, string, regex) {
+    if (string === undefined || !string.match(regex)) {
+      this.invalid(element);
+      return false;
+    } else {
+      this.valid(element);
+      return true
+    }
   },
   invalid: function(input) {
     input.closest('div').addClass('invalid');
