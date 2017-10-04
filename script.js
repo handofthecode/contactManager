@@ -1,3 +1,23 @@
+var Contact = {
+  setID: function(id) {
+    this.id = function() {
+      return id;
+    }
+  }, 
+  setProperties: function(name, email, phone, occupation) {
+    this.name = name;
+    this.email = email;
+    this.phone = phone;
+    this.occupation = occupation;
+  },
+  equals: function(otherContact) {
+    return this.id() === otherContact.id();
+  },
+  matches: function(id) {
+    return this.id() === id;
+  }
+}
+
 var ContactList = {
   length: function() {
     return this.list.length;
@@ -10,14 +30,11 @@ var ContactList = {
     localStorage.setItem('contacts', JSON.stringify(this.list));
     localStorage.setItem('serialID', this.serialID);
   },
-  incrementID: function() {
-    this.serialID++;
-  },
   add: function(contact) {
     this.list.push(contact);
   },
   delete: function(id) {
-    this.list = this.list.filter(contact => contact.id !== id);
+    this.list = this.list.filter(contact => contact.matches(id));
   },
   filter: function(tags, query) {
     result = [];
@@ -33,13 +50,14 @@ var ContactList = {
   },
   find: function(id) {
     var result = this.list.find(function(contact) {
-      return contact.id === id
+      console.dir(contact);
+      return contact.matches(id);
     });
 
     return result;
   },
   update: function(updatedContact) {
-    var index = this.list.findIndex(original => original.id === updatedContact.id);
+    var index = this.list.findIndex(original => original.equals(updatedContact));
     this.list.splice(index, 1, updatedContact);
   },
   init: function() {
@@ -70,7 +88,7 @@ var ContactManager = {
     var query = this.$searchBar.val().toLowerCase();
     var contactArray = this.contactList.filter(activeTags, query);
     this.loadContacts(contactArray);
-    this.noContactsNotice();
+    this.noContactsNotices();
   },
   activeTags: function() {
     var activeTags = [];
@@ -113,7 +131,7 @@ var ContactManager = {
 
     this.loadAllContacts();
     this.resetSearch();
-    this.noContactsNotice();
+    this.noContactsNotices();
   },
   resetSearch: function() {
     this.$search.val('');
@@ -122,6 +140,7 @@ var ContactManager = {
   handleUpdate: function(e) {
     var id = $(e.target).closest('.contact').attr('data-id');
     var contact = this.contactList.find(+id);
+    console.log(contact);
     this.openForm();
     this.$fullName.val(contact['name']);
     this.$email.val(contact['email']);
@@ -138,7 +157,7 @@ var ContactManager = {
     this.clearAllContacts();
     contactArray.forEach(contact => this.insertNewContact(contact));
   },
-  noContactsNotice: function() {
+  noContactsNotices: function() {
     if (this.$contacts.children('.contact').length === 0) {
       if (this.contactList.length === 0) {
         this.$noTags.slideUp();
@@ -175,23 +194,19 @@ var ContactManager = {
       e.preventDefault();
       var updateID = +this.$submitBTN.attr('data-updating') || null;
       var occupation = $('input[name="occupation"]:checked').val();
-      var contact = {
-        name: this.$fullName.val(),
-        email: this.$email.val(),
-        phone: this.$phone.val(),
-        occupation: occupation,
-        id: this.contactList.serialID,
-      };
+      var contact = Object.create(Contact);
+      contact.setProperties(this.$fullName.val(), this.$email.val(), this.$phone.val(), occupation,)
       if (this.validInput(contact)) {
         if (updateID) {
-          contact.id = updateID;
+          contact.setID(updateID);
           this.contactList.update(contact);
           this.loadAllContacts();
         } else {
+          contact.setID(this.contactList.serialID++);
           this.insertNewContact(contact);
           this.contactList.add(contact);
-          this.contactList.incrementID();
       }
+        console.dir(contact);
         this.handleCancel();
         this.clearForm();
         this.contactList.saveData();
