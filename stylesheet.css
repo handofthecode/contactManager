@@ -83,22 +83,21 @@ button.add_contact {
 	display: table;
 	clear: both;
 }
-#no_contacts,
-#no_contacts_found {
+div.notice {
 	margin: 40px 0 30px 0;
 	padding: 30px 0 10px 0;
 	display: none;
 }
 /* FORM */
-#new_contact {
+#create_contact {
 	display: none;
 	background-color: white;
 }
-#new_contact > h2 {
+#create_contact > h2 {
 	padding: 25px 0 10px 0;
 	border-bottom: 1px solid #ddd;
 }
-#new_contact button {
+#create_contact button {
 	width: 200px;
 	height: 40px;
 }
@@ -122,9 +121,18 @@ input[type="tel"] {
 	width: 250px;
 }
 p.notice {
- margin-bottom: 30px;
+ margin-bottom: -18px;
  text-align: center;
  display: none;
+}
+
+div.input:nth-child(3) p {
+	position: relative;
+	right: -82px;
+}
+input[type="tel"] {
+	color: transparent;
+	text-shadow: 0 0 0 #000;
 }
 form div {
 	background-color: #fff;
