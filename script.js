@@ -171,7 +171,7 @@ var ContactManager = {
           this.$starting.hide();
         } else {
           this.$starting.show();
-          this.$starting.html('"' + this.$searchBar.val() + '"');
+          this.$starting.children('em').html('"' + this.$searchBar.val() + '"');
         }
       }
     } else {
