@@ -34,7 +34,9 @@ var ContactList = {
     this.list.push(contact);
   },
   delete: function(id) {
-    this.list = this.list.filter(contact => contact.matches(id));
+    this.list = this.list.filter(function(contact) {
+      contact.matches(id);
+    });
   },
   filter: function(tags, query) {
     result = [];
@@ -106,7 +108,7 @@ var ContactManager = {
   handleOpenCreateForm: function() {
     if (this.$submitBTN[0].hasAttribute('data-updating')) {
       this.$submitBTN.removeAttr('data-updating');
-      $('#create_contact > h2').html('Create Contact');
+      this.$formHeader.html('Create Contact');
       this.clearForm();
     }
     this.setAllValid();
@@ -140,7 +142,7 @@ var ContactManager = {
     this.$phone.val(contact['phone']);
     $('#' + contact['occupation']).prop('checked', true);
     this.validInput(contact);
-    $('#new_contact h2').text('Edit Contact');
+    this.$formHeader.text('Edit Contact');
     this.$submitBTN.attr('data-updating', id);
   },
   loadAllContacts: function() {
@@ -152,7 +154,7 @@ var ContactManager = {
   },
   noContactsNotices: function() {
     if (this.$contacts.children('.contact').length === 0) {
-      if (this.contactList.length === 0) {
+      if (this.contactList.length() === 0) {
         this.$noTags.slideUp();
         this.$noResults.slideUp();
         this.$noContacts.slideDown();
@@ -163,12 +165,13 @@ var ContactManager = {
       } else {
         this.$noContacts.slideUp();
         this.$noTags.slideUp();
-        this.$noResults.slideDown().contents($('#tags').html(this.activeTags().join(' or ')));
+        this.$noResults.slideDown()
+        this.$tags.html(this.activeTags().join(' or '));
         if (this.$searchBar.val().length === 0) {
-          this.$noResults.contents($('#starting').hide());
+          this.$starting.hide();
         } else {
-          this.$noResults.contents($('#starting').show()
-                         .contents($('em').html('"' + this.$searchBar.val() + '"')));
+          this.$starting.show();
+          this.$starting.html('"' + this.$searchBar.val() + '"');
         }
       }
     } else {
@@ -252,7 +255,9 @@ var ContactManager = {
     /* NOTICES */
     this.$noResults = $('#no_results');
     this.$noContacts = $('#no_contacts');
-    this.$noTags = $('#no_tags')
+    this.$noTags = $('#no_tags');
+    this.$tags = $('#tags');
+    this.$starting = $('#starting');
 
     /* SEARCH */
     this.$search = $('#search');
@@ -260,6 +265,7 @@ var ContactManager = {
     this.$searchTags = $('input[name=search-tag]');
 
     /* FORM */
+    this.$formHeader = $('#create_contact > h2');
     this.$form = $('form');
     this.$fullName = $('#full_name');
     this.$email = $('#email');
@@ -276,6 +282,7 @@ var ContactManager = {
     this.registerHandlers();
     this.contactList.loadData();
     this.loadAllContacts();
+    this.noContactsNotices();
   }
 }
 var test = Object.create(ContactManager);
