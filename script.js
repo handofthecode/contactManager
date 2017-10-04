@@ -64,10 +64,6 @@ var ContactManager = {
   // handleValidateInput: function() {
 
   // },
-  handlePreventBadInput: function(e) {
-    if ($(e.target).is(this.$fullName) && !e.key.match(/[a-zA-Z ]/)) e.preventDefault();
-    if ($(e.target).is(this.$phone) && !e.key.match(/[0-9]/)) e.preventDefault();
-  },
   handleSearch: function(e) {
     this.clearAllContacts();
     var activeTags = this.activeTags();
@@ -83,6 +79,9 @@ var ContactManager = {
         if (tags[i].checked) activeTags.push(tags[i].getAttribute('data-tag'))
       });
     return activeTags;
+  },
+  clearAllContacts: function() {
+    $('.contact').remove();
   },
   handleDeleteContact: function(e) {
     var $contact = $(e.target.closest('.contact'));
@@ -102,7 +101,7 @@ var ContactManager = {
     this.openForm();
   },
   openForm: function() {
-    this.hideNoContactsFound();
+    this.hideNotices();
     this.$tools.slideUp();
     this.$contacts.slideUp();
     this.$createContact.slideDown();
@@ -132,6 +131,46 @@ var ContactManager = {
     $('#new_contact h2').text('Edit Contact');
     this.$submitBTN.attr('data-updating', id);
   },
+  loadAllContacts: function() {
+    this.loadContacts(this.contactList.list);
+  },
+  loadContacts: function(contactArray) {
+    this.clearAllContacts();
+    contactArray.forEach(contact => this.insertNewContact(contact));
+  },
+  noContactsNotice: function() {
+    if (this.$contacts.children('.contact').length === 0) {
+      if (this.contactList.length === 0) {
+        this.$noTags.slideUp();
+        this.$noResults.slideUp();
+        this.$noContacts.slideDown();
+      } else if (this.activeTags().length === 0) {
+        this.$noContacts.slideUp();
+        this.$noResults.slideUp();
+        this.$noTags.slideDown(); 
+      } else if (this.$searchBar.val().length === 0) {
+        this.$noContacts.slideUp();
+        this.$noTags.slideUp();
+        this.$noResults.slideDown().contents($('#tags').html(this.activeTags().join(' or ')))
+                                         .contents($('#starting').hide());
+      } else {
+        this.$noContacts.slideUp();
+        this.$noTags.slideUp();
+        this.$noResults.slideDown().contents($('#tags').html(this.activeTags().join(' or ')))
+                                         .contents($('#starting').show()
+                                         .contents($('em').html(this.$searchBar.val())));
+      }
+    }
+    else {
+      this.hideNotices();
+    }
+  },
+  hideNotices: function() {
+    this.$noContacts.slideUp();
+    this.$noTags.slideUp();
+    this.$noResults.slideUp();
+  },
+  /* FORM METHODS */
   handleSubmit: function(e) {
       e.preventDefault();
       var updateID = +this.$submitBTN.attr('data-updating') || null;
@@ -158,52 +197,12 @@ var ContactManager = {
         this.contactList.saveData();
       }
   },
-  loadAllContacts: function() {
-    this.loadContacts(this.contactList.list);
-  },
-  loadContacts: function(contactArray) {
-    this.clearAllContacts();
-    contactArray.forEach(contact => this.insertNewContact(contact));
-  },
-  noContactsNotice: function() {
-    if (this.$contacts.children('.contact').length === 0) {
-      if (this.contactList.length === 0) {
-        this.$noTags.slideUp();
-        this.$noContactsFound.slideUp();
-        this.$noContactsStarting.slideUp();
-        this.$noContacts.slideDown();
-      } else if (this.activeTags().length === 0) {
-        this.$noContacts.slideUp();
-        this.$noContactsFound.slideUp();
-        this.$noContactsStarting.slideUp();
-        this.$noTags.slideDown(); 
-      } else if (this.$searchBar.val().length === 0) {
-        this.$noContacts.slideUp();
-        this.$noTags.slideUp();
-        this.$noContactsStarting.slideUp();
-        this.$noContactsFound.slideDown();
-      } else {
-        this.$noContacts.slideUp();
-        this.$noTags.slideUp();
-        this.$noContactsFound.slideUp();
-        this.$noContactsStarting.slideDown().contents($('em').html(this.$searchBar.val()));
-      }
-    }
-    else {
-      this.hideNoContactsFound();
-    }
-  },
-  hideNoContactsFound: function() {
-    this.$noContacts.slideUp();
-    this.$noTags.slideUp();
-    this.$noContactsFound.slideUp();
-    this.$noContactsStarting.slideUp();
-  },
-  clearAllContacts: function() {
-    $('.contact').remove();
-  },
   clearForm: function() {
     $('button[type=reset]').trigger('click');
+  },
+  handlePreventBadInput: function(e) {
+    if ($(e.target).is(this.$fullName) && !e.key.match(/[a-zA-Z ]/)) e.preventDefault();
+    if ($(e.target).is(this.$phone) && !e.key.match(/[0-9]/)) e.preventDefault();
   },
   validInput: function(contact) {
     valid = true;
@@ -246,8 +245,7 @@ var ContactManager = {
     this.$addContact = $('.add_contact');
 
     /* NOTICES */
-    this.$noContactsStarting = $('#no_contacts_starting');
-    this.$noContactsFound = $('#no_contacts_found');
+    this.$noResults = $('#no_results');
     this.$noContacts = $('#no_contacts');
     this.$noTags = $('#no_tags')
 

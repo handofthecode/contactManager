@@ -125,14 +125,9 @@ p.notice {
  text-align: center;
  display: none;
 }
-
 div.input:nth-child(3) p {
 	position: relative;
 	right: -82px;
-}
-input[type="tel"] {
-	color: transparent;
-	text-shadow: 0 0 0 #000;
 }
 form div {
 	background-color: #fff;
@@ -161,6 +156,11 @@ input[type="radio"] {
 }
 fieldset#occupation > p {
 	color: red;
+}
+/* NOTICES */
+
+#starting {
+	display: none;
 }
 
 /* CONTACTS */
