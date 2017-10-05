@@ -39,7 +39,8 @@ var ContactList = {
   loadStoredList: function(storedList) {
     var contactObj;
     this.list = storedList.map(function(contact) {
-      return Object.create(Contact).init(contact.name, contact.email, contact.phone, contact.occupation).setID(contact.id);
+      return Object.create(Contact).init(contact.name, contact.email, contact.phone, contact.occupation)
+                                   .setID(contact.id);
     });
   },
   loadData: function() {
@@ -98,6 +99,7 @@ var ContactManager = {
     this.$form.on('keypress', 'input', this.handlePreventBadInput.bind(this)); 
     this.$submitBTN.on('click', this.handleSubmit.bind(this));
     this.$cancel.on('click', this.handleCancel.bind(this));
+    this.$form.on('blur', 'input', this.handleBlurValidate.bind(this));
   },
   handleSearch: function(e) {
     this.clearAllContacts();
@@ -231,20 +233,23 @@ var ContactManager = {
     $('button[type=reset]').trigger('click');
   },
   handlePreventBadInput: function(e) {
-    if ($(e.target).is(this.$fullName) && !e.key.match(/[a-zA-Z ]/)) e.preventDefault();
+    if ($(e.target).is(this.$fullName) && !e.key.match(/[a-zA-Z -]/)) e.preventDefault();
     if ($(e.target).is(this.$phone) && !e.key.match(/[0-9]/)) e.preventDefault();
+  },
+  handleBlurValidate: function() {
+    this.validInput({name: this.$fullName.val(), email: this.$email.val(), phone: this.$phone.val(), occupation: this.$occupation.val()});
   },
   validInput: function(contact) {
     valid = true;
-    if (!this.validateInput(this.$fullName, contact.name, /^\w+( \w*)*$/)) valid = false;
-    if (!this.validateInput(this.$email, contact.email, /^[a-zA-Z1-9._]+@\w+\.[a-z]{2,4}$/)) valid = false;
+    if (!this.validateInput(this.$fullName, contact.name, /^[\w\-]+[ \w\-]*$/)) valid = false;
+    if (!this.validateInput(this.$email, contact.email, /^[a-zA-Z1-9._]+@\w+\.[a-z]{2,5}$/)) valid = false;
     if (!this.validateInput(this.$phone, contact.phone, /^(\d{3}[\.-]?){2}\d{4}$/)) valid = false;
     if (!this.validateInput(this.$occupation, contact.occupation, '')) valid = false;
 
     return valid;
   },
   validateInput: function(element, string, regex) {
-    if (string === undefined || !string.match(regex)) {
+    if (string === undefined || string === '' || !string.match(regex)) {
       this.setInvalid(element);
       return false;
     } else {
