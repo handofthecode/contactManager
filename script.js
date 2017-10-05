@@ -1,5 +1,11 @@
 var Contact = {
   init: function(name, email, phone, occupation) {
+    if (typeof name === "object") {
+      occupation = name.occupation;
+      phone = name.phone;
+      email = name.email;
+      name = name.name;
+    }
     this.name = name;
     this.email = email;
     this.phone = phone;
@@ -101,21 +107,12 @@ var ContactManager = {
     this.$cancel.on('click', this.handleCancel.bind(this));
     this.$form.on('blur', 'input', this.handleBlurValidate.bind(this));
   },
-  handleSearch: function(e) {
-    this.clearAllContacts();
-    var activeTags = this.activeTags();
-    var query = this.$searchBar.val().toLowerCase();
-    var contactArray = this.contactList.filter(activeTags, query);
-    this.loadContacts(contactArray);
-    this.noContactsNotices();
+  loadAllContacts: function() {
+    this.loadContacts(this.contactList.list);
   },
-  activeTags: function() {
-    var activeTags = [];
-    var tags = this.$searchTags;
-      tags.each(function(i) {
-        if (tags[i].checked) activeTags.push(tags[i].getAttribute('data-tag'))
-      });
-    return activeTags;
+  loadContacts: function(contactArray) {
+    this.clearAllContacts();
+    contactArray.forEach(contact => this.insertNewContact(contact));
   },
   clearAllContacts: function() {
     $('.contact').remove();
@@ -143,37 +140,26 @@ var ContactManager = {
     this.$contacts.slideUp();
     this.$createContact.slideDown();
   },
-  handleCancel: function() {
-    this.$createContact.slideUp();
-    this.$contacts.slideDown();
-    this.$tools.slideDown();
-
-    this.loadAllContacts();
-    this.resetSearch();
+  /* SEARCH*/
+  handleSearch: function(e) {
+    this.clearAllContacts();
+    var activeTags = this.activeTags();
+    var query = this.$searchBar.val().toLowerCase();
+    var contactArray = this.contactList.filter(activeTags, query);
+    this.loadContacts(contactArray);
     this.noContactsNotices();
+  },
+  activeTags: function() {
+    var activeTags = [];
+    var tags = this.$searchTags;
+      tags.each(function(i) {
+        if (tags[i].checked) activeTags.push(tags[i].getAttribute('data-tag'))
+      });
+    return activeTags;
   },
   resetSearch: function() {
     this.$search.val('');
     this.$searchTags.prop('checked', true);
-  },
-  handleUpdate: function(e) {
-    var id = $(e.target).closest('.contact').attr('data-id');
-    var contact = this.contactList.find(+id);
-    this.openForm();
-    this.$fullName.val(contact['name']);
-    this.$email.val(contact['email']);
-    this.$phone.val(contact['phone']);
-    $('#' + contact['occupation']).prop('checked', true);
-    this.validInput(contact);
-    this.$formHeader.text('Edit Contact');
-    this.$submitBTN.attr('data-updating', id);
-  },
-  loadAllContacts: function() {
-    this.loadContacts(this.contactList.list);
-  },
-  loadContacts: function(contactArray) {
-    this.clearAllContacts();
-    contactArray.forEach(contact => this.insertNewContact(contact));
   },
   noContactsNotices: function() {
     if (this.$contacts.children('.contact').length === 0) {
@@ -206,14 +192,14 @@ var ContactManager = {
     this.$noTags.slideUp();
     this.$noResults.slideUp();
   },
+  /* FORMS */
   handleSubmit: function(e) {
       e.preventDefault();
       var updateID = +this.$submitBTN.attr('data-updating') || null;
-      var occupation = $('input[name="occupation"]:checked').val();
-      var contact = Object.create(Contact);
-      contact.init(this.$fullName.val(), this.$email.val(), this.$phone.val(), occupation);
+      if (this.validInput()) {
+        var contact = Object.create(Contact);
+        contact.init(this.formInput());
 
-      if (this.validInput(contact)) {
         if (updateID) {
           contact.setID(updateID);
           this.contactList.update(contact);
@@ -228,22 +214,71 @@ var ContactManager = {
         this.contactList.saveData();
       }
   },
+  populateForm: function(contact) {
+    this.$fullName.val(contact['name']);
+    this.$email.val(contact['email']);
+    this.$phone.val(contact['phone']);
+    $('#' + contact['occupation']).prop('checked', true);
+  },
+  handleUpdate: function(e) {
+    var id = $(e.target).closest('.contact').attr('data-id');
+    var contact = this.contactList.find(+id);
+    this.openForm();
+    this.populateForm(contact);
+    this.validInput();
+    this.$formHeader.text('Edit Contact');
+    this.$submitBTN.attr('data-updating', id);
+  },
+  handleCancel: function() {
+    this.$createContact.slideUp();
+    this.$contacts.slideDown();
+    this.$tools.slideDown();
+
+    this.loadAllContacts();
+    this.resetSearch();
+    this.noContactsNotices();
+  },
   clearForm: function() {
     $('button[type=reset]').trigger('click');
   },
+  insertNewContact: function(contact) {
+    var contactData = contact.toDataObject();
+    var source = $('#entry-template').html();
+    var template = Handlebars.compile(source);
+    this.$contacts.append(template(contact)).children('.contact:last-child').attr('data-id', contactData.id);
+  },
+  formInput: function(e) {
+    return {name: this.$fullName.val(), email: this.$email.val(), phone: this.$phone.val(), occupation: $('input[name=occupation]:checked').val()};
+  },
+  /* VALIDATION */
   handlePreventBadInput: function(e) {
     if ($(e.target).is(this.$fullName) && !e.key.match(/[a-zA-Z -]/)) e.preventDefault();
     if ($(e.target).is(this.$phone) && !e.key.match(/[0-9]/)) e.preventDefault();
   },
-  handleBlurValidate: function() {
-    this.validInput({name: this.$fullName.val(), email: this.$email.val(), phone: this.$phone.val(), occupation: this.$occupation.val()});
+  handleBlurValidate: function(e) {
+    var contact = this.formInput();
+    if ($(e.target).is(this.$fullName)) this.invalidName();
+    else if ($(e.target).is(this.$email)) this.invalidEmail();
+    else if ($(e.target).is(this.$phone)) this.invalidPhone();
+  },
+  invalidName: function() {
+    return !this.validateInput(this.$fullName, this.$fullName.val(), /^[\w\-]+[ \w\-]*$/);
+  },
+  invalidEmail: function() {
+    return !this.validateInput(this.$email, this.$email.val(), /^[a-zA-Z1-9._]+@\w+\.[a-z]{2,5}$/);
+  },
+  invalidPhone: function() {
+    return !this.validateInput(this.$phone, this.$phone.val(), /^(\d{3}[\.-]?){2}\d{4}$/);
+  },
+  invalidOccupation: function() {
+    return !this.validateInput(this.$occupation, $('input[name=occupation]:checked').val(), '')
   },
   validInput: function(contact) {
     valid = true;
-    if (!this.validateInput(this.$fullName, contact.name, /^[\w\-]+[ \w\-]*$/)) valid = false;
-    if (!this.validateInput(this.$email, contact.email, /^[a-zA-Z1-9._]+@\w+\.[a-z]{2,5}$/)) valid = false;
-    if (!this.validateInput(this.$phone, contact.phone, /^(\d{3}[\.-]?){2}\d{4}$/)) valid = false;
-    if (!this.validateInput(this.$occupation, contact.occupation, '')) valid = false;
+    if (this.invalidName()) valid = false;
+    if (this.invalidEmail()) valid = false;
+    if (this.invalidPhone()) valid = false;
+    if (this.invalidOccupation()) valid = false;
 
     return valid;
   },
@@ -264,12 +299,6 @@ var ContactManager = {
   },
   setAllValid: function() {
     $('div.input').removeClass('invalid');
-  },
-  insertNewContact: function(contact) {
-    var contactData = contact.toDataObject();
-    var source = $('#entry-template').html();
-    var template = Handlebars.compile(source);
-    this.$contacts.append(template(contact)).children('.contact:last-child').attr('data-id', contactData.id);
   },
   init: function() {
     this.$createContact = $('#create_contact'),
