@@ -36,6 +36,15 @@ var Contact = {
 }
 
 var ContactList = {
+  sort: function() {
+    this.list.sort(function(a, b) {
+      var nameA = a.name.toUpperCase();
+      var nameB = b.name.toUpperCase();
+      if (nameA < nameB) return -1;
+      else if (nameA > nameB) return 1;
+      else return 0;
+    });
+  },
   length: function() {
     return this.list.length;
   },
@@ -59,6 +68,7 @@ var ContactList = {
   },
   add: function(contact) {
     this.list.push(contact);
+    this.sort();
   },
   delete: function(id) {
     this.list = this.list.filter(function(contact) {
@@ -87,6 +97,7 @@ var ContactList = {
   update: function(updatedContact) {
     var index = this.list.findIndex(original => original.equals(updatedContact));
     this.list.splice(index, 1, updatedContact);
+    this.sort();
   },
   init: function() {
     this.loadData();
@@ -203,12 +214,11 @@ var ContactManager = {
         if (updateID) {
           contact.setID(updateID);
           this.contactList.update(contact);
-          this.loadAllContacts();
         } else {
           contact.setID(this.contactList.serialID++);
-          this.insertNewContact(contact);
           this.contactList.add(contact);
         }
+        this.loadAllContacts();
         this.handleCancel();
         this.clearForm();
         this.contactList.saveData();
