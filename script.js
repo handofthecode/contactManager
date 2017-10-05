@@ -37,7 +37,6 @@ var ContactList = {
     return this.list.map(contact => contact.toDataObject());
   },
   loadStoredList: function(storedList) {
-    var contactObj;
     this.list = storedList.map(function(contact) {
       return Object.create(Contact).init(contact.name, contact.email, contact.phone, contact.occupation)
                                    .setID(contact.id);
@@ -85,6 +84,7 @@ var ContactList = {
   },
   init: function() {
     this.loadData();
+    return this;
   },
 }
 
@@ -206,7 +206,6 @@ var ContactManager = {
     this.$noTags.slideUp();
     this.$noResults.slideUp();
   },
-  /* FORM METHODS */
   handleSubmit: function(e) {
       e.preventDefault();
       var updateID = +this.$submitBTN.attr('data-updating') || null;
@@ -305,8 +304,7 @@ var ContactManager = {
     this.$reset = $('#reset');
     this.$submitBTN = $('#submit');
 
-    this.contactList = Object.create(ContactList);
-    this.contactList.init();
+    this.contactList = Object.create(ContactList).init();
     this.registerHandlers();
     this.contactList.loadData();
     this.loadAllContacts();
