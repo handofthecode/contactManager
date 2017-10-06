@@ -1,7 +1,7 @@
 var Contact = {
-  init: function(name, email, phone, occupation) {
+  init: function(name, email, phone, category) {
     if (typeof name === "object") {
-      occupation = name.occupation;
+      category = name.category;
       phone = name.phone;
       email = name.email;
       name = name.name;
@@ -9,7 +9,7 @@ var Contact = {
     this.name = name;
     this.email = email;
     this.phone = phone;
-    this.occupation = occupation;
+    this.category = category;
     return this;
   },
   setID: function(id) {
@@ -29,7 +29,7 @@ var Contact = {
       name: this.name,
       email: this.email,
       phone: this.phone,
-      occupation: this.occupation,
+      category: this.category,
       id: this.id(),
     }
   },
@@ -53,7 +53,7 @@ var ContactList = {
   },
   loadStoredList: function(storedList) {
     this.list = storedList.map(function(contact) {
-      return Object.create(Contact).init(contact.name, contact.email, contact.phone, contact.occupation)
+      return Object.create(Contact).init(contact.name, contact.email, contact.phone, contact.category)
                                    .setID(contact.id);
     });
   },
@@ -78,9 +78,9 @@ var ContactList = {
   filter: function(tags, query) {
     result = [];
     this.list.forEach(function(contact) {
-      var occupation = contact.occupation;
+      var category = contact.category;
       var name = contact.name.toLowerCase();
-      if (tags.includes(occupation) && name.slice(0, query.length) === query) {
+      if (tags.includes(category) && name.slice(0, query.length) === query) {
         result.push(contact);
       }   
     }.bind(this));
@@ -107,6 +107,10 @@ var ContactList = {
 
 var ContactManager = {
   registerHandlers: function() {
+    /* setup */
+    this.$setup.on('click', 'button', this.handleSetup.bind(this));
+    this.$setup.on('keypress', 'input', this.preventBadCategories.bind(this));
+    /* contacts */
     this.$addContact.on('click', this.handleOpenCreateForm.bind(this));
     this.$contacts.on('click', '.delete', this.handleDeleteContact.bind(this));
     this.$contacts.on('click', '.edit', this.handleUpdate.bind(this));
@@ -118,6 +122,68 @@ var ContactManager = {
     this.$cancel.on('click', this.handleCancel.bind(this));
     this.$form.on('blur', 'input', this.handleBlurValidate.bind(this));
   },
+  loadCategories: function() {
+    this.categories = JSON.parse(localStorage.getItem('categories'));
+    if (!!this.categories) {
+      this.setCategories();
+    } else {
+      this.$setup.fadeIn();
+    }
+  },
+  /* SETUP */
+  handleSetup: function(e) {
+    e.preventDefault();
+    this.categories = [$('#setup-cat1').val(), $('#setup-cat2').val(), $('#setup-cat3').val()];
+    if (this.validateSetupInput(this.categories)) {
+      this.$setup.slideUp();
+      this.setCategories();
+      localStorage.setItem('categories', JSON.stringify(this.categories));
+    } else {
+      this.fadeInOut($('#setup-error2'));
+    }
+  },
+  preventBadCategories: function(e) {
+    if (!e.key.match(/[a-zA-Z -]/)) {
+      e.preventDefault();
+      this.fadeInOut($('#setup-error1'));
+    }
+  },
+  fadeInOut: function($element) {
+    $element.finish().fadeIn().delay(3000).fadeOut();
+  },
+  validateSetupInput: function(categories) {
+    return (this.noneEmpty(categories) && this.uniqueValues(categories))
+  },
+  noneEmpty: function(categories) {
+    return !categories.some(function(category) {
+      return this.noInput(category);
+    }.bind(this));
+    return true
+  },
+  uniqueValues: function(arr) {
+    for (var i = 0; i < arr.length - 1; i++) {
+      for (var j = i + 1; j < arr.length; j++) {
+        if (arr[i].trim() === arr[j].trim()) {
+          return false;
+        }
+      }
+    }
+    return true;
+  },
+  setCategories() {
+    var $labels = this.$catTags.children('label');
+    var $inputs = this.$catTags.children('input');
+    this.categories.forEach(function(category, i) {
+      var id = i + 1;
+      /* form categories */
+      $('label[for=cat' + id + ']').text(category);
+      $('#cat' + id).val(category)
+      /* search categories */
+      $labels.eq(i).text(category);
+      $inputs.eq(i).attr('data-tag', category);
+    });
+  },
+  /* MANAGING CONTACTS AND INTERFACE*/
   loadAllContacts: function() {
     this.loadContacts(this.contactList.list);
   },
@@ -150,6 +216,12 @@ var ContactManager = {
     this.$tools.slideUp();
     this.$contacts.slideUp();
     this.$createContact.slideDown();
+  },
+  insertNewContact: function(contact) {
+    var contactData = contact.toDataObject();
+    var source = $('#entry-template').html();
+    var template = Handlebars.compile(source);
+    this.$contacts.append(template(contact)).children('.contact:last-child').attr('data-id', contactData.id);
   },
   /* SEARCH*/
   handleSearch: function(e) {
@@ -228,7 +300,7 @@ var ContactManager = {
     this.$fullName.val(contact['name']);
     this.$email.val(contact['email']);
     this.$phone.val(contact['phone']);
-    $('#' + contact['occupation']).prop('checked', true);
+    $('input[value=' + contact['category'] + ']').prop('checked', true);
   },
   handleUpdate: function(e) {
     var id = $(e.target).closest('.contact').attr('data-id');
@@ -251,14 +323,8 @@ var ContactManager = {
   clearForm: function() {
     $('button[type=reset]').trigger('click');
   },
-  insertNewContact: function(contact) {
-    var contactData = contact.toDataObject();
-    var source = $('#entry-template').html();
-    var template = Handlebars.compile(source);
-    this.$contacts.append(template(contact)).children('.contact:last-child').attr('data-id', contactData.id);
-  },
   formInput: function(e) {
-    return {name: this.$fullName.val(), email: this.$email.val(), phone: this.$phone.val(), occupation: $('input[name=occupation]:checked').val()};
+    return {name: this.$fullName.val(), email: this.$email.val(), phone: this.$phone.val(), category: $('input[name=categories]:checked').val()};
   },
   /* VALIDATION */
   handlePreventBadInput: function(e) {
@@ -280,20 +346,23 @@ var ContactManager = {
   invalidPhone: function() {
     return !this.validateInput(this.$phone, this.$phone.val(), /^(\d{3}[\.-]?){2}\d{4}$/);
   },
-  invalidOccupation: function() {
-    return !this.validateInput(this.$occupation, $('input[name=occupation]:checked').val(), '')
+  invalidcategories: function() {
+    return !this.validateInput(this.$categories, $('input[name=categories]:checked').val(), '')
   },
   validInput: function(contact) {
     valid = true;
     if (this.invalidName()) valid = false;
     if (this.invalidEmail()) valid = false;
     if (this.invalidPhone()) valid = false;
-    if (this.invalidOccupation()) valid = false;
+    if (this.invalidcategories()) valid = false;
 
     return valid;
   },
+  noInput: function(string) {
+    if (string === '' || string === undefined) return true;
+  },
   validateInput: function(element, string, regex) {
-    if (string === undefined || string === '' || !string.match(regex)) {
+    if (this.noInput(string) || !string.match(regex)) {
       this.setInvalid(element);
       return false;
     } else {
@@ -314,30 +383,29 @@ var ContactManager = {
     this.$createContact = $('#create_contact'),
     this.$tools = $('#tools');
     this.$contacts = $('#contacts');
-
-    /* BUTTONS */
+    this.$setup = $('#setup').add('#tint');
     this.$addContact = $('.add_contact');
-
     /* NOTICES */
     this.$noResults = $('#no_results');
     this.$noContacts = $('#no_contacts');
     this.$noTags = $('#no_tags');
     this.$tags = $('#tags');
     this.$starting = $('#starting');
-
     /* SEARCH */
     this.$search = $('#search');
     this.$searchBar = $('#search input[type=text]');
     this.$searchTags = $('input[name=search-tag]');
-
+    this.$catTags = $('#cat-tags')
     /* FORM */
     this.$formHeader = $('#create_contact > h2');
     this.$form = $('form');
     this.$fullName = $('#full_name');
     this.$email = $('#email');
     this.$phone = $('#phone');
-    this.$occupation = $('#occupation');
-
+    this.$categories = $('#categories');
+    this.$cat1 = $('#cat1');
+    this.$cat2 = $('#cat2');
+    this.$cat3 = $('#cat3');
     /* FORM BUTTONS */
     this.$cancel = $('#cancel');
     this.$reset = $('#reset');
@@ -345,6 +413,7 @@ var ContactManager = {
 
     this.contactList = Object.create(ContactList).init();
     this.registerHandlers();
+    this.loadCategories();
     this.contactList.loadData();
     this.loadAllContacts();
     this.noContactsNotices();

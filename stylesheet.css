@@ -148,7 +148,7 @@ div.invalid input {
 input[type="radio"] {
 	margin-right: 20px;
 }
-fieldset#occupation > p {
+fieldset#categories > p {
 	color: red;
 }
 /* NOTICES */
@@ -187,5 +187,59 @@ dd {
 
 footer {
 	border-top: 1px solid lightgrey;
+}
+
+/* SETUP */
+#setup {
+	height: 330px;
+	position: fixed;
+	z-index: 2;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	margin: auto;
+}
+#setup h2 {
+	padding: 50px;
+}
+#setup button {
+	height: 100px;
+	width: 150px;
+	display: block;
+	margin: 30px auto;
+}
+#setup input {
+	text-align: center;
+	margin-bottom: 10px;
+}
+#tint {
+	background: rgba(0, 0, 0, .5);
+	z-index: 1;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	display: none;
+}
+#setup-error1,
+#setup-error2 {
+	position: absolute;
+	color: red;
+	display: none;
+	margin-left: auto;
+	margin-right: auto;
+	left: 0;
+	right: 0;
+}
+@media screen and (max-width: 820px) {
+	#setup {
+		height: 450px;
+	}
+	#setup input {
+		display: block;
+		margin: 0 auto;
+	}
 }
 

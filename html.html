@@ -11,97 +11,105 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.js"></script>
 </head>
 	<body>
-			<header>
-				<h1>Contact Manager</h1>
-			</header>
-			<main>
-				<div id="tools">
-					<button class="add_contact">Add Contact</button>
-					<div id="search">
-						<input type="text" placeholder="Search" />
-						<div>
-							<label>engineering
-								<input type="checkbox" id="search_enginering" data-tag="engineering" name="search-tag" checked/>
-							</label>
-							<label>marketing
-								<input type="checkbox" id="search_marketing" data-tag="marketing" name="search-tag" checked/>
-							</label>
-							<label>sales
-								<input type="checkbox" id="search_sales" data-tag="sales" name="search-tag" checked/>
-							</label>
-						</div>
+		<div id="tint">
+			<div id="setup">
+				<h2>What three categories would you like to use to organize your contacts?</h2>
+				<input type="text" id="setup-cat1" maxlength="15"/>
+				<input type="text" id="setup-cat2" maxlength="15"/>
+				<input type="text" id="setup-cat3" maxlength="15"/>
+				<div id="setup-error1">Categories must contain only alphabetic characters, '-'s or ' 's</div>
+				<div id="setup-error2"><p>Categories must be non-empty and unique</p></div>
+				<button type="submit" id="set-categories">Start Managing!</button>
+			</div>
+		</div>
+		<header>
+			<h1>Contact Manager</h1>
+		</header>
+		<main>
+			<div id="tools">
+				<button class="add_contact">Add Contact</button>
+				<div id="search">
+					<input type="text" placeholder="Search" />
+					<div id="cat-tags">
+						<label for="tag1">cat1</label>
+						<input type="checkbox" data-tag="cat1" name="search-tag" id="tag1" checked/>
+						<label for="tag2">cat2</label>
+						<input type="checkbox" data-tag="cat2" name="search-tag" id="tag2" checked/>
+						<label for="tag3">cat3</label>
+						<input type="checkbox" data-tag="cat3" name="search-tag" id="tag3" checked/>
 					</div>
 				</div>
-				<div id="no_tags" class='notice'>
-					<h2>No tags selected!</h2>
-				</div>
-				<div id="no_contacts" class='notice'>
-					<h2>There are no contacts</h2>
-					<button class="add_contact">Add Contact</button>
-				</div>
-				<div id="no_results" class='notice'>
-					<h2>No <span id="tags"></span> contacts <span id="starting">starting with <em></em> </span> found</h2>
-				</div>
-				<div id="contacts">
-					<script id="entry-template" type="text/x-handlebars-template">
-						<div class="contact" data-id="0">
-							<h3>{{name}}</h3>
-							<dl>
-								<dt>Phone Number:</dt>
-								<dd>{{phone}}</dd>
-								<dt>Email:</dt>
-								<dd>{{email}}</dd>
-								<dt>Occupation:</dt>
-								<dd>{{occupation}}</dd>
-							</dl>
-							<button type="button" class="edit">Edit</button>
-							<button type="button" class="delete">Delete</button>
-						</div>
-					</script>
-				</div>
-				<div id="create_contact">
-					<h2>Create Contact</h2>
-					<form>
-						<fieldset>
-							<fieldset class="inputs">
-								<div class='input'>
-									<label for="full_name">Full name:</label>
-									<input type='text' id="full_name"/>
-									<p class="notice">please enter a valid name</p>
-								</div>
-								<div class='input'>
-									<label for="email">Email address:</label>
-									<input type="email" id="email" />
-									<p class="notice">please enter a valid email</p>
-								</div>
-								<div class='input'>
-									<label for="phone">Phone number:</label>
-									<input type="tel" id="phone"/>
-									<p class="notice">please enter a valid 10-digit phone number</p>
-								</div>
-							</fieldset>
+			</div>
+			<div id="no_tags" class='notice'>
+				<h2>No tags selected!</h2>
+			</div>
+			<div id="no_contacts" class='notice'>
+				<h2>There are no contacts</h2>
+				<button class="add_contact">Add Contact</button>
+			</div>
+			<div id="no_results" class='notice'>
+				<h2>No <span id="tags"></span> contacts <span id="starting">starting with <em></em> </span> found</h2>
+			</div>
+			<div id="contacts">
+				<script id="entry-template" type="text/x-handlebars-template">
+					<div class="contact" data-id="0">
+						<h3>{{name}}</h3>
+						<dl>
+							<dt>Phone Number:</dt>
+							<dd>{{phone}}</dd>
+							<dt>Email:</dt>
+							<dd>{{email}}</dd>
+							<dt>Category:</dt>
+							<dd>{{category}}</dd>
+						</dl>
+						<button type="button" class="edit">Edit</button>
+						<button type="button" class="delete">Delete</button>
+					</div>
+				</script>
+			</div>
+			<div id="create_contact">
+				<h2>Create Contact</h2>
+				<form>
+					<fieldset>
+						<fieldset class="inputs">
 							<div class='input'>
-								<fieldset id="occupation">
-									<label for="engineering">engineering</label>
-									<input type="radio" name="occupation" id="engineering" value="engineering">
-									<label for="marketing">marketing</label>
-									<input type="radio" name="occupation" id="marketing" value="marketing">
-									<label for="sales">sales</label>
-									<input type="radio" name="occupation" id="sales" value="sales">
-								</fieldset>
-								<p class="notice">please select an occupation</p>
+								<label for="full_name">Full name:</label>
+								<input type='text' id="full_name"/>
+								<p class="notice">please enter a valid name</p>
 							</div>
-							<fieldset>
-								<button type="submit" id="submit">Submit</button>
-								<button type="button" id="cancel">Cancel</button>
-								<button type="reset" id="reset">Reset</button>
-							</fieldset>
+							<div class='input'>
+								<label for="email">Email address:</label>
+								<input type="email" id="email" />
+								<p class="notice">please enter a valid email</p>
+							</div>
+							<div class='input'>
+								<label for="phone">Phone number:</label>
+								<input type="tel" id="phone"/>
+								<p class="notice">please enter a valid 10-digit phone number</p>
+							</div>
 						</fieldset>
-					</form>
-				</div>
-			</main>
-			<footer>
-			</footer>
-			<script src="script.js"></script>
+						<div class='input'>
+							<fieldset id="categories">
+								<label for="cat1">cat1</label>
+								<input type="radio" name="categories" id="cat1" value="cat1">
+								<label for="cat2">cat2</label>
+								<input type="radio" name="categories" id="cat2" value="cat2">
+								<label for="cat3">cat3</label>
+								<input type="radio" name="categories" id="cat3" value="cat3">
+							</fieldset>
+							<p class="notice">please select a category</p>
+						</div>
+						<fieldset>
+							<button type="submit" id="submit">Submit</button>
+							<button type="button" id="cancel">Cancel</button>
+							<button type="reset" id="reset">Reset</button>
+						</fieldset>
+					</fieldset>
+				</form>
+			</div>
+		</main>
+		<footer>
+		</footer>
+		<script src="script.js"></script>
 	</body>
 </html>
