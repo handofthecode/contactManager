@@ -300,7 +300,7 @@ var ContactManager = {
     this.$fullName.val(contact['name']);
     this.$email.val(contact['email']);
     this.$phone.val(contact['phone']);
-    $('input[value=' + contact['category'] + ']').prop('checked', true);
+    $('input[value="' + contact['category'] + '"]').prop('checked', true);
   },
   handleUpdate: function(e) {
     var id = $(e.target).closest('.contact').attr('data-id');
