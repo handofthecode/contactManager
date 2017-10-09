@@ -109,6 +109,7 @@ var ContactManager = {
   registerHandlers: function() {
     /* setup */
     this.$setup.on('click', 'button', this.handleSetup.bind(this));
+    this.$setup.on('keypress', this.handleSetup.bind(this));
     this.$setup.on('keypress', 'input', this.preventBadCategories.bind(this));
     /* contacts */
     this.$addContact.on('click', this.handleOpenCreateForm.bind(this));
@@ -132,14 +133,16 @@ var ContactManager = {
   },
   /* SETUP */
   handleSetup: function(e) {
-    e.preventDefault();
-    this.categories = [$('#setup-cat1').val(), $('#setup-cat2').val(), $('#setup-cat3').val()];
-    if (this.validateSetupInput(this.categories)) {
-      this.$setup.slideUp();
-      this.setCategories();
-      localStorage.setItem('categories', JSON.stringify(this.categories));
-    } else {
-      this.fadeInOut($('#setup-error2'));
+    if (e.key === 'Enter' || e.key === undefined) {
+      e.preventDefault();
+      this.categories = [$('#setup-cat1').val(), $('#setup-cat2').val(), $('#setup-cat3').val()];
+      if (this.validateSetupInput(this.categories)) {
+        this.$setup.slideUp();
+        this.setCategories();
+        localStorage.setItem('categories', JSON.stringify(this.categories));
+      } else {
+        this.fadeInOut($('#setup-error2'));
+      }
     }
   },
   preventBadCategories: function(e) {
@@ -186,6 +189,7 @@ var ContactManager = {
   /* MANAGING CONTACTS AND INTERFACE*/
   loadAllContacts: function() {
     this.loadContacts(this.contactList.list);
+    this.noContactsNotices();
   },
   loadContacts: function(contactArray) {
     this.clearAllContacts();
@@ -199,8 +203,9 @@ var ContactManager = {
     var id = +$contact.attr('data-id');
     this.contactList.delete(id);
     $contact.remove();
-    this.handleCancel();
     this.contactList.saveData();
+    this.noContactsNotices();
+
   },
   handleOpenCreateForm: function() {
     if (this.$submitBTN[0].hasAttribute('data-updating')) {
@@ -417,7 +422,48 @@ var ContactManager = {
     this.contactList.loadData();
     this.loadAllContacts();
     this.noContactsNotices();
+    return this;
   }
 }
-var test = Object.create(ContactManager);
-test.init();
+
+var Tester = {
+  generateRandomContacts: function(quantity) {
+    if (quantity <= 1000 && this.manager.contactList.list.length < 2000) {
+      for (var i = 0; i < quantity; i++) {
+        var obj = {
+          name: this.getRandom(this.alpha, 7), 
+          email: this.getRandom(this.alpha, 5) + '@' + this.getRandom(this.alpha, 4) + '.com',
+          phone: this.getRandom(this.numbers, 10),
+          category: this.random(this.manager.categories) 
+        }
+        var contact = Object.create(Contact).init(obj).setID(test.contactList.serialID++);
+        this.manager.contactList.add(contact);
+      }
+      this.manager.loadAllContacts();
+    } else {
+      alert('unable to generate over 1000 contacts at a time.')
+    }
+  },
+  random: function(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  },
+  getRandom: function(arr, length) {
+    var result = '';
+    for (var i = 0; i < length; i++) {
+      result += this.random(arr);
+    }
+    return result;
+  },
+  deleteAll: function() {
+    this.manager.contactList.list = [];
+    this.manager.loadAllContacts();
+  },
+  init: function(manager) {
+    this.alpha = ['a','b','c','d','e','f', 'h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+    this.numbers = ['0','1','2','3','4','5','6','7','8','9'];
+    this.manager = manager;
+    return this;
+  }
+}
+var test = Object.create(ContactManager).init();
+var admin = Object.create(Tester).init(test);
