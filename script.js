@@ -200,12 +200,30 @@ var ContactManager = {
   },
   handleDeleteContact: function(e) {
     var $contact = $(e.target.closest('.contact'));
+    var $count = $contact.find('.deleting span em').html(5);
+    var num = 4
+    var countDown;
+    $contact.addClass('delete-ready');
+    $contact.on('click', '.abort', function(e){
+      $contact.removeClass('delete-ready');
+      clearInterval(countDown);
+    });
+    var countDown = setInterval(function() {
+      $count.text(num);
+      if (num > 0) {
+        num -= 1;
+      } else {
+        this.deleteContact($contact);
+        clearInterval(countDown); 
+      }
+    }.bind(this), 1000)
+  },
+  deleteContact: function($contact) {
     var id = +$contact.attr('data-id');
     this.contactList.delete(id);
     $contact.remove();
     this.contactList.saveData();
-    this.noContactsNotices();
-
+    this.noContactsNotices();  
   },
   handleOpenCreateForm: function() {
     if (this.$submitBTN[0].hasAttribute('data-updating')) {

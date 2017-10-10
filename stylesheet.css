@@ -166,25 +166,52 @@ em {
 
 /* CONTACTS */
 #contacts {
-	background-color: white;
+	background-color: #fff;
 	text-align: left;
 	padding: 15px;
 }
+#contacts div {
+	background-color: #fff;
+}
 .contact {
 	display: inline-block;
-	background-color: white;
+	width: 200px;
+	height: 320px;
 	border: 1px solid #aaa;
 	padding: 0 10px 0 10px;
 	margin-bottom: 5px;
+}
+.contact button {
+	margin: 0 20px 0 20px;
+}
+.contact h3 {
+	height: 40px;
+}
+.delete-ready .buttons,
+div.deleting {
+	display: none;
+}
+button.abort {
+	margin: 0 0 0 5px;
 }
 dt {
 	font-weight: 600;
 }
 dd {
+	display: block;
 	text-indent: 10px;
 	margin-bottom: 10px;
-}
+	width: 200px;
+	height: 30px;
+	word-break: break-all;
 
+}
+.delete-ready {
+	border: solid 1px red;
+}
+.delete-ready .deleting {
+	display: block;
+}
 footer {
 	border-top: 1px solid lightgrey;
 }
