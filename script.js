@@ -300,24 +300,24 @@ var ContactManager = {
   },
   /* FORMS */
   handleSubmit: function(e) {
-      e.preventDefault();
-      var updateID = +this.$submitBTN.attr('data-updating') || null;
-      if (this.validInput()) {
-        var contact = Object.create(Contact);
-        contact.init(this.formInput());
+    e.preventDefault();
+    var updateID = +this.$submitBTN.attr('data-updating') || null;
+    if (this.validInput()) {
+      var contact = Object.create(Contact);
+      contact.init(this.formInput());
 
-        if (updateID) {
-          contact.setID(updateID);
-          this.contactList.update(contact);
-        } else {
-          contact.setID(this.contactList.serialID++);
-          this.contactList.add(contact);
-        }
-        this.loadAllContacts();
-        this.handleCancel();
-        this.clearForm();
-        this.contactList.saveData();
+      if (updateID) {
+        contact.setID(updateID);
+        this.contactList.update(contact);
+      } else {
+        contact.setID(this.contactList.serialID++);
+        this.contactList.add(contact);
       }
+      this.loadAllContacts();
+      this.handleCancel();
+      this.clearForm();
+      this.contactList.saveData();
+    }
   },
   populateForm: function(contact) {
     this.$fullName.val(contact['name']);
@@ -459,7 +459,7 @@ var Tester = {
       }
       this.manager.loadAllContacts();
     } else {
-      alert('unable to generate over 1000 contacts at a time.')
+      alert('You cannot generate that many contacts.')
     }
   },
   random: function(arr) {
@@ -474,7 +474,19 @@ var Tester = {
   },
   deleteAll: function() {
     this.manager.contactList.list = [];
+    this.manager.contactList.saveData();
     this.manager.loadAllContacts();
+  },
+  resetCategories: function() {
+    this.manager.categories = null;
+    localStorage.categories = null;
+    this.manager.contactList.saveData();
+    window.location.reload(true);
+
+  },
+  reset: function() {
+    this.deleteAll();
+    this.resetCategories();
   },
   init: function(manager) {
     this.alpha = ['a','b','c','d','e','f', 'h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
